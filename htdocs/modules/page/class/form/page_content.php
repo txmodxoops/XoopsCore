@@ -12,7 +12,7 @@
 /**
  * page module
  *
- * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
+ * @copyright       XOOPS Project (http://xoops.org)
  * @license         GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package         page
  * @since           2.6.0
@@ -20,14 +20,12 @@
  * @version         $Id$
  */
 
-defined('XOOPS_ROOT_PATH') or die('Restricted access');
-
 class PagePage_contentForm extends Xoops\Form\ThemeForm
 {
     /**
      * @param PagePage_content|XoopsObject $obj
      */
-    public function __construct(PagePage_content &$obj)
+    public function __construct(PagePage_content $obj)
     {
         $helper = Page::getInstance();
         $xoops = $helper->xoops();
@@ -35,7 +33,7 @@ class PagePage_contentForm extends Xoops\Form\ThemeForm
 
         $title = $obj->isNew() ? PageLocale::A_ADD_CONTENT : PageLocale::A_EDIT_CONTENT;
         parent::__construct($title, 'form', 'content.php', 'post', true, 'raw');
-        $tabtray = new Xoops\Form\TabTray('', 'uniqueid');
+        $tabTray = new Xoops\Form\TabTray('', 'uniqueid');
 
         /**
          * Main
@@ -48,7 +46,7 @@ class PagePage_contentForm extends Xoops\Form\ThemeForm
             $tab1->addElement(new Xoops\Form\SelectUser(XoopsLocale::AUTHOR, 'content_author', true, $content_author, 1, false), true);
 //        }
         //date
-        $tab1->addElement(new Xoops\Form\DateTime(XoopsLocale::DATE, 'content_create', 2, $obj->getVar('content_create'), false));
+        $tab1->addElement(new Xoops\Form\DateTime(XoopsLocale::DATE, 'content_create', $obj->getVar('content_create')));
         //title
         $tab1->addElement(new Xoops\Form\Text(XoopsLocale::TITLE, 'content_title', 12, 255, $obj->getVar('content_title'), ''), true);
         // editor
@@ -74,7 +72,7 @@ class PagePage_contentForm extends Xoops\Form\ThemeForm
         $weight->setPattern('^\d+$', PageLocale::E_WEIGHT);
         $tab1->addElement($weight, true);
 
-        $tabtray->addElement($tab1);
+        $tabTray->addElement($tab1);
 
         /**
          * Metas
@@ -85,7 +83,7 @@ class PagePage_contentForm extends Xoops\Form\ThemeForm
         //content_mdescription
         $tab2->addElement(new Xoops\Form\TextArea(PageLocale::CONTENT_META_DESCRIPTION, 'content_mdescription', $obj->getVar('content_mdescription'), 5, 11));
 
-        $tabtray->addElement($tab2);
+        $tabTray->addElement($tab2);
 
         /**
          * Options
@@ -96,7 +94,7 @@ class PagePage_contentForm extends Xoops\Form\ThemeForm
         $checkbox = new Xoops\Form\Checkbox(XoopsLocale::OPTIONS, 'content_option', $content_option, false);
         $checkbox->setDescription(PageLocale::CONTENT_OPTIONS_DSC);
         foreach ($obj->options as $option) {
-            $checkbox->addOption($option, Xoops_Locale::translate('L_CONTENT_DO' . strtoupper($option), 'page'));
+            $checkbox->addOption($option, \Xoops\Locale::translate('L_CONTENT_DO' . strtoupper($option), 'page'));
         }
         $tab3->addElement($checkbox);
         //maindisplay
@@ -104,7 +102,7 @@ class PagePage_contentForm extends Xoops\Form\ThemeForm
         //active
         $tab3->addElement(new Xoops\Form\RadioYesNo(XoopsLocale::ACTIVE, 'content_status', $obj->getVar('content_status')));
 
-        $tabtray->addElement($tab3);
+        $tabTray->addElement($tab3);
 
         /**
          * Permissions
@@ -112,7 +110,7 @@ class PagePage_contentForm extends Xoops\Form\ThemeForm
         if ($helper->isUserAdmin()) {
             $tab4 = new Xoops\Form\Tab(PageLocale::TAB_PERMISSIONS, 'permissions');
             //permissions
-            $group_list = $xoops->getHandler('member')->getGroupList();
+            $group_list = $xoops->getHandlerMember()->getGroupList();
             $full_list = array_keys($group_list);
             if (!$obj->isNew()) {
                 $module_id = $helper->getModule()->getVar('mid', 'n');
@@ -125,32 +123,32 @@ class PagePage_contentForm extends Xoops\Form\ThemeForm
             $groups_can_view_checkbox->addOptionArray($group_list);
             $tab4->addElement($groups_can_view_checkbox);
 
-            $tabtray->addElement($tab4);
+            $tabTray->addElement($tab4);
         }
 
-        $this->addElement($tabtray);
+        $this->addElement($tabTray);
 
         $this->addElement(new Xoops\Form\Hidden('content_id', $obj->getVar('content_id')));
 
         /**
          * Buttons
          */
-        $button_tray = new Xoops\Form\ElementTray('', '');
-        $button_tray->addElement(new Xoops\Form\Hidden('op', 'save'));
+        $buttonTray = new Xoops\Form\ElementTray('', '');
+        $buttonTray->addElement(new Xoops\Form\Hidden('op', 'save'));
 
-        $button = new Xoops\Form\Button('', 'submit', XoopsLocale::A_SUBMIT, 'submit');
-        $button->setClass('btn btn-success');
-        $button_tray->addElement($button);
+        $buttonSubmit = new Xoops\Form\Button('', 'submit', XoopsLocale::A_SUBMIT, 'submit');
+        $buttonSubmit->setClass('btn btn-success');
+        $buttonTray->addElement($buttonSubmit);
 
-        $button_2 = new Xoops\Form\Button('', 'reset', XoopsLocale::A_RESET, 'reset');
-        $button_2->setClass('btn btn-warning');
-        $button_tray->addElement($button_2);
+        $buttonReset = new Xoops\Form\Button('', 'reset', XoopsLocale::A_RESET, 'reset');
+        $buttonReset->setClass('btn btn-warning');
+        $buttonTray->addElement($buttonReset);
 
-        $button_3 = new Xoops\Form\Button('', 'cancel', XoopsLocale::A_CANCEL, 'button');
-        $button_3->setExtra("onclick='javascript:history.go(-1);'");
-        $button_3->setClass('btn btn-danger');
-        $button_tray->addElement($button_3);
+        $buttonCancel = new Xoops\Form\Button('', 'cancel', XoopsLocale::A_CANCEL, 'button');
+        $buttonCancel->setExtra("onclick='javascript:history.go(-1);'");
+        $buttonCancel->setClass('btn btn-danger');
+        $buttonTray->addElement($buttonCancel);
 
-        $this->addElement($button_tray);
+        $this->addElement($buttonTray);
     }
 }

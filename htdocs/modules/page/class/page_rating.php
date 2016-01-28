@@ -10,11 +10,13 @@
 */
 
 use Xoops\Core\Database\Connection;
+use Xoops\Core\Kernel\XoopsObject;
+use Xoops\Core\Kernel\XoopsPersistableObjectHandler;
 
 /**
  * page module
  *
- * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
+ * @copyright       XOOPS Project (http://xoops.org)
  * @license         GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package         page
  * @since           2.6.0
@@ -52,7 +54,7 @@ class PagePage_ratingHandler extends XoopsPersistableObjectHandler
     {
         $helper = Page::getInstance();
         $uid = $helper->getUserId();
-        $ip  = $helper->xoops()->getenv('REMOTE_ADDR');
+        $ip  = $helper->xoops()->getEnv('REMOTE_ADDR');
 
 
         $criteria = new CriteriaCompo();
@@ -74,7 +76,7 @@ class PagePage_ratingHandler extends XoopsPersistableObjectHandler
     {
         $helper = Page::getInstance();
         $uid = $helper->getUserId();
-        $ip  = $helper->xoops()->getenv('REMOTE_ADDR');
+        $ip  = $helper->xoops()->getEnv('REMOTE_ADDR');
 
         $criteria = new CriteriaCompo();
         $criteria->add(new Criteria('rating_content_id', $content_id));

@@ -10,11 +10,13 @@
 */
 
 use Xoops\Core\Database\Connection;
+use Xoops\Core\Kernel\XoopsObject;
+use Xoops\Core\Kernel\XoopsPersistableObjectHandler;
 
 /**
  * page module
  *
- * @copyright       The XOOPS Project http://sourceforge.net/projects/xoops/
+ * @copyright       XOOPS Project (http://xoops.org)
  * @license         GNU GPL 2 or later (http://www.gnu.org/licenses/gpl-2.0.html)
  * @package         page
  * @since           2.6.0
@@ -38,7 +40,7 @@ class PagePage_related extends XoopsObject
     public function getValues($keys = null, $format = null, $maxDepth = null)
     {
         $ret = parent::getValues($keys, $format, $maxDepth);
-        $ret['navigation'] = Xoops_Locale::translate('L_RELATED_NAVIGATION_OPTION' . $this->getVar('related_navigation'), 'page');
+        $ret['navigation'] = \Xoops\Locale::translate('L_RELATED_NAVIGATION_OPTION' . $this->getVar('related_navigation'), 'page');
         $ret['related_links'] = Page::getInstance()->getLinkHandler()->getLinks($this->getVar('related_id'));
         return $ret;
     }
@@ -63,21 +65,22 @@ class PagePage_relatedHandler extends XoopsPersistableObjectHandler
 
     public function getRelated($start = 0, $limit = 0, $sort = 'related_name', $order = 'ASC')
     {
-        $criteria = new CriteriaCompo();
-        $criteria->setSort($sort);
-        $criteria->setOrder($order);
-        $criteria->setStart($start);
-        $criteria->setLimit($limit);
+        $criteria = $this->getCriteriaSets(new CriteriaCompo(), $start, $limit, $sort, $order);
         return parent::getAll($criteria, null, false);
     }
 
     public function countRelated($start = 0, $limit = 0, $sort = 'related_name', $order = 'ASC')
     {
-        $criteria = new CriteriaCompo();
+        $criteria = $this->getCriteriaSets(new CriteriaCompo(), $start, $limit, $sort, $order);
+        return parent::getCount($criteria);
+    }
+	
+	private function getCriteriaSets($criteria, $start, $limit, $sort, $order)
+    {
         $criteria->setSort($sort);
         $criteria->setOrder($order);
         $criteria->setStart($start);
         $criteria->setLimit($limit);
-        return parent::getCount();
+        return $criteria;
     }
 }
